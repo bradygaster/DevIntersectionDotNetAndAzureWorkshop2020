@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+import "google/protobuf/duration.proto";
+
+option csharp_namespace = "Basketball";
+
+message Game {
+	string game_id = 1;
+}
+
+message Score {
+	int32 home_score = 1;
+	int32 away_score = 2;
+	google.protobuf.Duration game_clock = 3;
+}
+
+service Scorer {
+  rpc GetScore (Game) returns (stream Score);
+}

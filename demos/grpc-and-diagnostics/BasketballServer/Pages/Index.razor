@@ -1,0 +1,75 @@
+﻿@page "/"
+@using Basketball
+
+<div class="jumbotron">
+  <h1 class="display-4">Game @scoreKeeper.GameId</h1>
+  <hr class="my-4">
+  <h1>@gameClock.ToString("c")</h1>
+  <h1>Home @homeScore : Away @awayScore</h1>
+</div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-sm">
+        <div class="row">
+            Home team
+        </div>
+        <div class="row">
+            <button @onclick="(e => scoreKeeper.ShotMade(Team.Home, 1))">Free throw</button>
+        </div>
+        <div class="row">
+            <button @onclick="(e => scoreKeeper.ShotMade(Team.Home, 2))">2 pointer</button>
+        </div>
+        <div class="row">
+            <button @onclick="(e => scoreKeeper.ShotMade(Team.Home, 3))">3 pointer</button>
+        </div>
+    </div>
+    <div class="col-sm">
+        <div class="row">
+            Away team
+        </div>
+        <div class="row">
+            <button @onclick="(e => scoreKeeper.ShotMade(Team.Away, 1))">Free throw</button>
+        </div>
+        <div class="row">
+            <button @onclick="(e => scoreKeeper.ShotMade(Team.Away, 2))">2 pointer</button>
+        </div>
+        <div class="row">
+            <button @onclick="(e => scoreKeeper.ShotMade(Team.Away, 3))">3 pointer</button>
+        </div>
+    </div>
+  </div>
+</div>
+
+@code {
+    private static int id = 0;
+    private ScoreKeeper scoreKeeper;
+    private int homeScore = 0;
+    private int awayScore = 0;
+    private TimeSpan gameClock = TimeSpan.Zero;
+
+    protected override Task OnInitializedAsync()
+    {
+        scoreKeeper= ScoreKeeper.CreateGame(id.ToString());
+        id++;
+        scoreKeeper.ScoreUpdated += (_, e) =>
+        {
+            Update(e.Score);
+        };
+        scoreKeeper.Start();
+        return Task.CompletedTask;
+    }
+
+    private void Update(Score score)
+    {
+        homeScore = score.HomeScore;
+        awayScore = score.AwayScore;
+        gameClock = score.GameClock.ToTimeSpan();
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        scoreKeeper.Dispose();
+    }
+}
